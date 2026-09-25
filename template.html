@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#001740; --ink2:#00244A; --ink3:#002E5F;
+  --rule:#0F3A6B; --rule-soft:#0A2A50;
+  --cyan:#00C0E8; --mint:#7FE3C4; --peach:#FFBB99;
+  --paper:#EAF1F7; --dim:#8CA6C4; --dimmer:#5D7A9C;
+  --mono:"Azeret Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--ink); color:var(--paper);
+  font-family:var(--sans); font-size:15px; line-height:1.55;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:0 24px 96px}
+
+/* ---------- masthead ---------- */
+.mast{border-bottom:1px solid var(--rule); padding:30px 0 18px; margin-bottom:34px}
+.mast h1{
+  font-family:var(--mono); font-weight:600; font-size:23px; letter-spacing:-.01em;
+  margin:0 0 4px; line-height:1.25;
+}
+.mast .client{font-family:var(--mono); font-size:12px; color:var(--cyan); letter-spacing:.14em; margin:0 0 14px}
+.stamp{display:flex; flex-wrap:wrap; gap:0; font-family:var(--mono); font-size:11.5px; color:var(--dim)}
+.stamp span{padding:0 16px; border-left:1px solid var(--rule)}
+.stamp span:first-child{padding-left:0; border-left:0}
+
+/* ---------- controls ---------- */
+.controls{display:flex; flex-wrap:wrap; gap:22px; align-items:flex-end; margin-bottom:30px}
+.ctl{display:flex; flex-direction:column; gap:6px}
+.ctl > label{font-family:var(--mono); font-size:10.5px; color:var(--dimmer); letter-spacing:.1em}
+.seg{display:flex; border:1px solid var(--rule)}
+.seg button{
+  font-family:var(--mono); font-size:12px; color:var(--dim); background:transparent;
+  border:0; border-left:1px solid var(--rule); padding:7px 13px; cursor:pointer;
+}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--cyan); color:var(--ink); font-weight:600}
+.seg button:focus-visible{outline:2px solid var(--mint); outline-offset:-2px}
+select,input[type=search]{
+  font-family:var(--mono); font-size:12px; background:var(--ink2); color:var(--paper);
+  border:1px solid var(--rule); padding:7px 10px; min-width:170px;
+}
+input[type=search]{font-family:var(--sans); font-size:13px}
+select:focus-visible,input:focus-visible{outline:2px solid var(--mint); outline-offset:-2px}
+
+/* ---------- section headers ---------- */
+.sec{margin:0 0 6px; font-family:var(--mono); font-weight:600; font-size:15px; letter-spacing:-.005em}
+.sec-note{margin:0 0 20px; font-size:13px; color:var(--dim); max-width:62ch}
+
+/* ---------- convergence board ---------- */
+.board-scroll{overflow-x:auto; margin:0 -24px; padding:0 24px}
+.board{border-collapse:collapse; width:100%; min-width:760px}
+.board th,.board td{padding:0; font-weight:400}
+.board thead th{
+  font-family:var(--mono); font-size:10.5px; color:var(--dimmer);
+  padding-bottom:9px; text-align:center; vertical-align:bottom; font-weight:500;
+}
+.board thead th.h-topic{text-align:left; padding-left:2px}
+.board thead th.h-num{text-align:right; padding-right:2px; white-space:nowrap}
+.board tbody tr{border-top:1px solid var(--rule-soft); cursor:pointer}
+.board tbody tr:hover{background:var(--ink2)}
+.board tbody tr[aria-pressed="true"]{background:var(--ink3)}
+.board tbody tr:focus-visible{outline:2px solid var(--mint); outline-offset:-2px}
+.t-label{
+  font-family:var(--mono); font-size:12px; padding:9px 14px 9px 2px !important;
+  white-space:nowrap; position:sticky; left:0; background:var(--ink);
+  max-width:230px; overflow:hidden; text-overflow:ellipsis;
+}
+.board tbody tr:hover .t-label{background:var(--ink2)}
+.board tbody tr[aria-pressed="true"] .t-label{background:var(--ink3); color:#fff}
+.cell{text-align:center; vertical-align:middle}
+.dot{
+  display:inline-block; width:15px; height:15px; background:var(--cyan);
+  border-radius:1px; vertical-align:middle;
+}
+.dot.none{width:3px; height:3px; background:var(--rule); border-radius:50%}
+.voices{
+  font-family:var(--mono); font-size:12px; text-align:right; padding-right:14px !important;
+  white-space:nowrap; color:var(--paper);
+}
+.voices em{font-style:normal; color:var(--dimmer)}
+.barcell{width:150px; padding-right:8px !important}
+.bar{height:7px; background:var(--mint); display:block}
+.eng{
+  font-family:var(--mono); font-size:11.5px; color:var(--dim);
+  text-align:right; white-space:nowrap; padding-left:8px !important;
+}
+.legend{
+  display:flex; flex-wrap:wrap; gap:4px 18px; margin:16px 0 0;
+  font-family:var(--mono); font-size:11px; color:var(--dim);
+}
+.legend b{color:var(--paper); font-weight:500}
+.kind{font-size:9.5px; color:var(--dimmer); margin-left:7px; letter-spacing:.06em}
+.board-note{font-family:var(--mono); font-size:11px; color:var(--dimmer); margin:12px 0 0}
+.legend .warn{color:var(--peach)}
+
+/* ---------- topic detail ---------- */
+.detail{border:1px solid var(--rule); background:var(--ink2); padding:20px 22px; margin:30px 0 0}
+.detail.empty{border-style:dashed; background:transparent; color:var(--dim); font-size:13.5px}
+.detail h3{font-family:var(--mono); font-size:15px; font-weight:600; margin:0 0 12px}
+.detail .facts{display:flex; flex-wrap:wrap; gap:26px; margin-bottom:16px}
+.fact{display:flex; flex-direction:column}
+.fact b{font-family:var(--mono); font-size:21px; font-weight:600; line-height:1.1}
+.fact span{font-family:var(--mono); font-size:10.5px; color:var(--dimmer); letter-spacing:.06em}
+.detail p{margin:0 0 8px; font-size:13.5px; color:var(--dim); max-width:74ch}
+.detail p b{color:var(--paper); font-weight:600}
+.terms{display:flex; flex-wrap:wrap; gap:6px; margin-top:4px}
+.term{font-family:var(--mono); font-size:11px; border:1px solid var(--rule); padding:2px 8px; color:var(--paper)}
+.term i{font-style:normal; color:var(--dimmer)}
+.clear{
+  font-family:var(--mono); font-size:11px; background:transparent; color:var(--cyan);
+  border:1px solid var(--rule); padding:5px 11px; cursor:pointer; margin-top:4px;
+}
+
+/* ---------- posts ---------- */
+.posts-head{display:flex; flex-wrap:wrap; gap:18px; align-items:flex-end; justify-content:space-between; margin:52px 0 20px}
+.post{display:grid; grid-template-columns:76px 1fr; gap:0 20px; border-top:1px solid var(--rule-soft); padding:20px 0}
+.post:last-child{border-bottom:1px solid var(--rule-soft)}
+.score{font-family:var(--mono); text-align:right}
+.score b{display:block; font-size:17px; font-weight:600; line-height:1.2}
+.score span{font-size:10px; color:var(--dimmer); letter-spacing:.06em}
+.meta{font-family:var(--mono); font-size:11.5px; color:var(--dim); margin-bottom:7px}
+.meta b{color:var(--paper); font-weight:500}
+.meta i{font-style:normal; color:var(--dimmer)}
+.excerpt{margin:0 0 11px; font-size:14.5px; line-height:1.6; max-width:78ch; color:#DCE7F2}
+.post-foot{display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center}
+.chip{
+  font-family:var(--mono); font-size:10.5px; background:transparent; color:var(--cyan);
+  border:1px solid var(--rule); padding:3px 8px; cursor:pointer;
+}
+.chip:hover{border-color:var(--cyan)}
+.chip-none{font-family:var(--mono); font-size:10.5px; color:var(--dimmer); border:1px dashed var(--rule-soft); padding:3px 8px}
+.stats{font-family:var(--mono); font-size:11px; color:var(--dimmer)}
+.open{font-family:var(--mono); font-size:11px; color:var(--paper); text-decoration:none; border-bottom:1px solid var(--cyan); padding-bottom:1px}
+.open:hover{color:var(--cyan)}
+.empty-state{border:1px dashed var(--rule); padding:34px 22px; text-align:center; color:var(--dim); font-size:13.5px}
+
+/* ---------- method ---------- */
+details.method{margin-top:56px; border-top:1px solid var(--rule); padding-top:22px}
+details.method summary{
+  font-family:var(--mono); font-size:12.5px; color:var(--cyan); cursor:pointer;
+  list-style:none; display:inline-block;
+}
+details.method summary::-webkit-details-marker{display:none}
+details.method summary::before{content:"+ "; color:var(--dimmer)}
+details.method[open] summary::before{content:"– "}
+details.method .body{font-size:13.5px; color:var(--dim); max-width:76ch; margin-top:16px}
+details.method h4{font-family:var(--mono); font-size:12.5px; color:var(--paper); margin:20px 0 6px; font-weight:600}
+details.method ul{margin:6px 0; padding-left:20px}
+details.method li{margin-bottom:5px}
+.coverage{width:100%; border-collapse:collapse; margin-top:10px; font-family:var(--mono); font-size:11.5px}
+.coverage th{text-align:left; color:var(--dimmer); font-weight:500; padding:4px 12px 4px 0; border-bottom:1px solid var(--rule)}
+.coverage td{padding:4px 12px 4px 0; border-bottom:1px solid var(--rule-soft); color:var(--paper)}
+.coverage td.short{color:var(--peach)}
+
+@media (max-width:640px){
+  .wrap{padding:0 16px 72px}
+  .board-scroll{margin:0 -16px; padding:0 16px}
+  .mast h1{font-size:19px}
+  .post{grid-template-columns:1fr; gap:8px}
+  .score{text-align:left}
+  .score b{display:inline; margin-right:6px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .dot{animation:in .32s ease-out both}
+}
+@keyframes in{from{opacity:0; transform:scale(.4)} to{opacity:1; transform:scale(1)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <p class="client">__CLIENT__</p>
+    <h1>__TITLE__</h1>
+    <div class="stamp" id="stamp"></div>
+  </header>
+
+  <div class="controls">
+    <div class="ctl">
+      <label id="lbl-mode">Overlap on</label>
+      <div class="seg" id="mode" role="group" aria-labelledby="lbl-mode">
+        <button data-mode="ent" aria-pressed="true">Named subjects</button>
+        <button data-mode="theme" aria-pressed="false">Broad themes</button>
+      </div>
+    </div>
+    <div class="ctl">
+      <label id="lbl-window">Period ending <span id="latest"></span></label>
+      <div class="seg" id="window" role="group" aria-labelledby="lbl-window"></div>
+    </div>
+    <div class="ctl">
+      <label id="lbl-min">Shared by</label>
+      <div class="seg" id="minvoices" role="group" aria-labelledby="lbl-min">
+        <button data-min="2" aria-pressed="true">2+ voices</button>
+        <button data-min="1" aria-pressed="false">Any</button>
+      </div>
+    </div>
+    <div class="ctl" id="ctl-places">
+      <label id="lbl-places">Places and acronyms</label>
+      <div class="seg" id="places" role="group" aria-labelledby="lbl-places">
+        <button data-places="0" aria-pressed="true">Hidden</button>
+        <button data-places="1" aria-pressed="false">Shown</button>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sec">Where the voices overlap</h2>
+  <p class="sec-note" id="board-note"></p>
+
+  <div class="board-scroll">
+    <table class="board" id="board"><thead></thead><tbody></tbody></table>
+  </div>
+  <p class="board-note" id="board-more"></p>
+  <div class="legend" id="legend"></div>
+
+  <div class="detail empty" id="detail">No topic selected. Choose a row above to see the posts, the
+    voices carrying it and the language they use.</div>
+
+  <div class="posts-head">
+    <div>
+      <h2 class="sec" id="posts-title">Posts that cut through</h2>
+      <p class="sec-note" style="margin:0" id="posts-note"></p>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end">
+      <div class="ctl">
+        <label id="lbl-sort">Rank by</label>
+        <div class="seg" id="sort" role="group" aria-labelledby="lbl-sort">
+          <button data-sort="score" aria-pressed="true">Engagement</button>
+          <button data-sort="date" aria-pressed="false">Most recent</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <label for="author">Voice</label>
+        <select id="author"></select>
+      </div>
+      <div class="ctl">
+        <label for="q">Search</label>
+        <input type="search" id="q" placeholder="word or phrase">
+      </div>
+      <button class="clear" id="csv" style="margin:0; padding:7px 12px">Download this view</button>
+    </div>
+  </div>
+
+  <div id="posts"></div>
+
+  <details class="method">
+    <summary>How this was built, and what it can't tell you</summary>
+    <div class="body">
+      <p>Posts are collected from the public LinkedIn activity of the tracked profiles listed below.
+        Each post is scored as <b>reactions + (__W_COMMENTS__ × comments) + (__W_SHARES__ × shares)</b>,
+        on the basis that a comment or a share costs the reader more than a reaction and is the better
+        signal that a topic has landed.</p>
+
+      <h4>Named subjects</h4>
+      <p>The default board works at the level of specific things — a person, a brand, a piece of work,
+        an event. These are pulled from three places: LinkedIn's own @-mentions, which come typed as a
+        person or a company and are the most reliable; hashtags; and runs of capitalised words in the
+        post body and any attached article title.</p>
+      <p>That third source is the useful one and the noisy one. It is filtered to drop sentence-opening
+        capitals, job titles, credit lists, bare first names and generic acronyms. Some noise still
+        gets through, so read a row before you act on it rather than trusting the label. Places and
+        acronyms are typed and hidden by default, because they are usually context rather than subject.</p>
+      <p>Subjects named in only one post are kept, so the tags under each post are complete, but the
+        two-voice threshold keeps them out of the overlap board. Switching to <b>Any</b> shows them and
+        will surface considerably more noise.</p>
+      <p>LinkedIn itself is excluded. It gets named constantly and tells you nothing about what the
+        conversation is about. The exclusion list is the right place for anything else that is
+        self-referential rather than a subject.</p>
+      <p>Names are folded where they are obviously the same subject, so a surname on its own merges into
+        the full name it appears with. This is a text-matching exercise, not entity resolution: two
+        people with the same surname will be merged wrongly, and the same brand written two ways may
+        stay split.</p>
+
+      <h4>Broad themes</h4>
+      <p>The second board mode uses a keyword framework over the same text. A post can sit in up to four
+        themes, and roughly a third match none — general motivational content with no subject matter
+        falls out, which is intended. Themes are good for the shape of the conversation and too general
+        to brief a post against on their own.</p>
+
+      <h4>Read the overlap, not the volume</h4>
+      <p>Rows are ranked by the number of distinct voices first, engagement second. That ordering is
+        deliberate: engagement totals are dominated by whoever posts most and has the largest
+        following, whereas the count of separate voices is a much steadier signal that a subject is
+        genuinely live in this community rather than one person's hobby horse.</p>
+      <p>Two voices is a low bar on a watchlist of eleven, and on a short period it can be coincidence.
+        Treat two as worth a look and three or more as worth acting on.</p>
+
+      <h4>Uneven history per voice</h4>
+      <p>The scraper returns a fixed number of recent posts per profile, so a prolific poster's history
+        reaches back days while a light poster's reaches back months. Any period longer than the
+        shortest history below will understate the voices marked in
+        <span style="color:var(--peach)">amber</span>. For a like-for-like comparison, stay inside the
+        shortest window.</p>
+      <table class="coverage" id="coverage">
+        <thead><tr><th>Voice</th><th>Posts held</th><th>History starts</th><th>Days</th></tr></thead>
+        <tbody></tbody>
+      </table>
+
+      <h4>Other limits worth stating to a client</h4>
+      <ul>
+        <li>Engagement counts are as at the collection date; recent posts are still accruing and will
+          be understated against older ones.</li>
+        <li>Reposts are attributed to the tracked voice that shared them, with the original author noted.</li>
+        <li>Neither board catches intent. A row tells you a subject came up, not whether the voices
+          were agreeing, arguing or taking the opposite side.</li>
+        <li>A subject can be named in passing. The post text is on the page so you can check whether it
+          was the point of the post or a footnote.</li>
+        <li>This is a snapshot, not a live feed. The collection date is stamped at the top.</li>
+      </ul>
+    </div>
+  </details>
+
+</div>
+
+<script id="payload" type="application/json">__DATA__</script>
+<script>
+(function(){
+"use strict";
+var D = JSON.parse(document.getElementById("payload").textContent);
+var POSTS = D.posts;
+var ENT = D.entities || [];
+var HIDDEN_KINDS = {place:1, acronym:1};
+var MAX_ROWS = 26;
+var LATEST = POSTS.reduce(function(m,p){ return p.date > m ? p.date : m; }, "");
+var WINDOWS = [7,14,30,90,0];
+
+var state = { mode:"ent", win:14, min:2, sort:"score", author:"", q:"", sel:null, places:0 };
+
+/* ---------- helpers ---------- */
+function shiftDays(iso,n){
+  var d = new Date(iso+"T00:00:00Z");
+  d.setUTCDate(d.getUTCDate()-n);
+  return d.toISOString().slice(0,10);
+}
+function dayGap(a,b){
+  return Math.round((new Date(b+"T00:00:00Z") - new Date(a+"T00:00:00Z"))/86400000);
+}
+function pretty(iso){
+  var M=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var p=iso.split("-");
+  return parseInt(p[2],10)+" "+M[parseInt(p[1],10)-1]+" "+p[0];
+}
+function num(n){
+  if(n>=10000) return (n/1000).toFixed(0)+"k";
+  if(n>=1000) return (n/1000).toFixed(1)+"k";
+  return String(n);
+}
+function initials(name){
+  return name.split(/\s+/).map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();
+}
+function esc(s){
+  return String(s).replace(/[&<>"']/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function windowStart(){ return state.win ? shiftDays(LATEST, state.win-1) : "0000-00-00"; }
+function selLabel(){
+  if(state.sel === null) return "";
+  return state.mode === "ent" ? (ENT[Number(state.sel)] || {name:""}).name : state.sel;
+}
+function renderModeCopy(){
+  document.getElementById("board-note").textContent = state.mode === "ent"
+    ? "Each row is a specific subject named in the posts \u2014 a person, a brand, a piece of work, an event. Each square is one tracked voice, sized by their share of that subject's engagement. Two or more squares on a row means separate voices landed on the same thing."
+    : "Each row is a broad theme from the keyword framework. Useful for the shape of the conversation, but too general to brief a post against on its own.";
+  document.getElementById("ctl-places").style.display = state.mode === "ent" ? "" : "none";
+}
+
+/* Posts inside the current period, before topic/author/search filters. */
+function inPeriod(){
+  var from = windowStart();
+  return POSTS.filter(function(p){ return p.date >= from; });
+}
+
+/* ---------- aggregation ---------- */
+/* One row per named subject, or per broad theme, depending on the mode.
+   `context` holds what to show in the detail panel: co-occurring subjects for
+   an entity, triggering vocabulary for a theme. */
+function visibleEnt(id){
+  var e = ENT[id];
+  return e && (state.places || !HIDDEN_KINDS[e.kind]);
+}
+
+function aggregate(posts){
+  var map = {};
+  function row(key, label, kind){
+    return map[key] || (map[key] = {
+      key:String(key), label:label, kind:kind||"",
+      posts:0, score:0, byAuthor:{}, context:{}
+    });
+  }
+
+  posts.forEach(function(p){
+    if(state.mode === "ent"){
+      var ids = p.ents.filter(visibleEnt);
+      ids.forEach(function(id){
+        var e = ENT[id], r = row(id, e.name, e.kind);
+        r.posts += 1; r.score += p.score;
+        r.byAuthor[p.author] = (r.byAuthor[p.author]||0) + p.score;
+        ids.forEach(function(o){
+          if(o !== id) r.context[ENT[o].name] = (r.context[ENT[o].name]||0) + 1;
+        });
+      });
+    } else {
+      p.topics.forEach(function(t,i){
+        var r = row(t, t, "");
+        r.posts += 1; r.score += p.score;
+        r.byAuthor[p.author] = (r.byAuthor[p.author]||0) + p.score;
+        (p.terms[i]||[]).forEach(function(w){ r.context[w] = (r.context[w]||0)+1; });
+      });
+    }
+  });
+
+  return Object.keys(map).map(function(k){
+    var r = map[k];
+    r.voices = Object.keys(r.byAuthor).length;
+    return r;
+  }).sort(function(a,b){
+    return b.voices - a.voices || b.score - a.score || (a.label < b.label ? -1 : 1);
+  });
+}
+
+/* ---------- render: board ---------- */
+function renderBoard(rows){
+  var authors = D.authors;
+  var thead = document.querySelector("#board thead");
+  var tbody = document.querySelector("#board tbody");
+
+  thead.innerHTML = "<tr><th class='h-topic'>Topic</th>" +
+    authors.map(function(a){
+      return "<th title='"+esc(a)+"'>"+esc(initials(a))+"</th>";
+    }).join("") +
+    "<th class='h-num'>Voices</th><th colspan='2' class='h-num'>Engagement</th></tr>";
+
+  var all = rows.filter(function(r){ return r.voices >= state.min; });
+  if(!all.length){
+    tbody.innerHTML = "<tr><td colspan='"+(authors.length+4)+"' style='padding:26px 0; color:var(--dim); font-size:13.5px'>" +
+      "Nothing is carried by " + state.min + "+ voices in this period. Try a longer period, or switch to Any.</td></tr>";
+    document.getElementById("board-more").textContent = "";
+    return;
+  }
+  var shown = all.slice(0, MAX_ROWS);
+  document.getElementById("board-more").textContent = all.length > MAX_ROWS
+    ? "Showing the top " + MAX_ROWS + " of " + all.length + ", ranked by number of voices then engagement."
+    : "";
+  var maxScore = shown[0] ? Math.max.apply(null, shown.map(function(r){return r.score;})) : 1;
+
+  tbody.innerHTML = shown.map(function(r,ri){
+    var peak = Math.max.apply(null, authors.map(function(a){ return r.byAuthor[a]||0; })) || 1;
+    var cells = authors.map(function(a,ci){
+      var v = r.byAuthor[a] || 0;
+      if(!v) return "<td class='cell'><span class='dot none'></span></td>";
+      var share = v/peak;
+      var size = 7 + Math.round(Math.sqrt(share)*9);
+      var op = (0.34 + share*0.66).toFixed(2);
+      return "<td class='cell'><span class='dot' style=\"width:"+size+"px;height:"+size+"px;opacity:"+op+
+        ";animation-delay:"+(ri*14+ci*9)+"ms\" title='"+esc(a)+" \u2014 "+num(v)+"'></span></td>";
+    }).join("");
+    var sel = state.sel === r.key;
+    var kind = (state.mode === "ent" && r.kind && r.kind !== "other")
+      ? " <span class='kind'>"+esc(r.kind)+"</span>" : "";
+    return "<tr tabindex='0' role='button' data-key='"+esc(r.key)+"' aria-pressed='"+sel+"'>" +
+      "<td class='t-label' title='"+esc(r.label)+"'>"+esc(r.label)+kind+"</td>" + cells +
+      "<td class='voices'>"+r.voices+"<em>/"+authors.length+"</em></td>" +
+      "<td class='barcell'><span class='bar' style='width:"+Math.max(2,Math.round(r.score/maxScore*100))+"%'></span></td>" +
+      "<td class='eng'>"+num(r.score)+"</td></tr>";
+  }).join("");
+}
+
+function renderLegend(){
+  var from = windowStart();
+  var el = document.getElementById("legend");
+  var parts = D.authors.map(function(a){
+    var c = D.coverage[a];
+    var thin = state.win && c && c.from > from;
+    return "<span class='"+(thin?"warn":"")+"'><b>"+esc(initials(a))+"</b> "+esc(a)+(thin?" \u2020":"")+"</span>";
+  });
+  parts.push("<span class='warn'>\u2020 history starts inside this period \u2014 understated</span>");
+  el.innerHTML = parts.join("");
+}
+
+/* ---------- render: topic detail ---------- */
+function renderDetail(rows){
+  var el = document.getElementById("detail");
+  if(state.sel === null){
+    el.className = "detail empty";
+    el.textContent = "Nothing selected. Choose a row above to see the posts behind it, the voices carrying it and what else it comes up with.";
+    return;
+  }
+  var r = rows.filter(function(x){ return x.key === state.sel; })[0];
+  if(!r){
+    el.className = "detail empty";
+    el.textContent = "That selection has no posts in this period.";
+    return;
+  }
+  var byA = Object.keys(r.byAuthor).sort(function(a,b){ return r.byAuthor[b]-r.byAuthor[a]; });
+  var terms = Object.keys(r.context).sort(function(a,b){ return r.context[b]-r.context[a]; }).slice(0,10);
+  var concentration = Math.round(r.byAuthor[byA[0]]/r.score*100);
+
+  el.className = "detail";
+  el.innerHTML =
+    "<h3>"+esc(r.label)+(r.kind && r.kind!=="other" ? " <span class='kind'>"+esc(r.kind)+"</span>" : "")+"</h3>" +
+    "<div class='facts'>" +
+      "<div class='fact'><b>"+r.voices+" of "+D.authors.length+"</b><span>voices posting</span></div>" +
+      "<div class='fact'><b>"+r.posts+"</b><span>posts</span></div>" +
+      "<div class='fact'><b>"+num(r.score)+"</b><span>weighted engagement</span></div>" +
+      "<div class='fact'><b>"+concentration+"%</b><span>from "+esc(byA[0])+"</span></div>" +
+    "</div>" +
+    "<p>Loudest on this subject: <b>"+esc(byA.slice(0,3).join(", "))+"</b>." +
+      (concentration >= 60 ? " One voice accounts for most of the engagement here, so treat it as their territory rather than a settled industry conversation." : "") +
+    "</p>" +
+    (terms.length
+      ? "<p>" + (state.mode === "ent" ? "Comes up alongside:" : "Recurring language in these posts:") + "</p>" +
+        "<div class='terms'>"+terms.map(function(t){
+          return "<span class='term'>"+esc(t)+" <i>"+r.context[t]+"</i></span>";
+        }).join("")+"</div>"
+      : "") +
+    "<button class='clear' id='clear-topic'>Clear selection</button>";
+
+  document.getElementById("clear-topic").onclick = function(){ state.sel = null; render(); };
+}
+
+/* ---------- render: posts ---------- */
+function visiblePosts(){
+  var out = inPeriod();
+  if(state.sel !== null){
+    if(state.mode === "ent"){
+      var id = Number(state.sel);
+      out = out.filter(function(p){ return p.ents.indexOf(id) > -1; });
+    } else {
+      out = out.filter(function(p){ return p.topics.indexOf(state.sel) > -1; });
+    }
+  }
+  if(state.author) out = out.filter(function(p){ return p.author === state.author; });
+  if(state.q){
+    var q = state.q.toLowerCase();
+    out = out.filter(function(p){ return p.excerpt.toLowerCase().indexOf(q) > -1; });
+  }
+  return out.slice().sort(function(a,b){
+    return state.sort === "score" ? b.score - a.score : (a.date < b.date ? 1 : a.date > b.date ? -1 : b.score - a.score);
+  });
+}
+
+function renderPosts(list){
+  var el = document.getElementById("posts");
+  document.getElementById("posts-note").textContent =
+    list.length ? list.length + (state.sel !== null ? " posts on \u201C"+selLabel()+"\u201D" : " posts") +
+      " between " + pretty(state.win ? windowStart() : POSTS[POSTS.length-1].date) + " and " + pretty(LATEST)
+    : "";
+  if(!list.length){
+    el.innerHTML = "<div class='empty-state'>Nothing matches these filters. Widen the period, clear the topic, or search for something else.</div>";
+    return;
+  }
+  el.innerHTML = list.slice(0,120).map(function(p){
+    var chips;
+    if(state.mode === "ent"){
+      var ids = p.ents.filter(visibleEnt);
+      chips = ids.length
+        ? ids.slice(0,6).map(function(id){
+            return "<button class='chip' data-key='"+id+"'>"+esc(ENT[id].name)+"</button>";
+          }).join("")
+        : "<span class='chip-none'>no named subject</span>";
+    } else {
+      chips = p.topics.length
+        ? p.topics.map(function(t){
+            return "<button class='chip' data-key='"+esc(t)+"'>"+esc(t)+"</button>";
+          }).join("")
+        : "<span class='chip-none'>no theme matched</span>";
+    }
+    return "<article class='post'>" +
+      "<div class='score'><b>"+num(p.score)+"</b><span>score</span></div>" +
+      "<div>" +
+        "<div class='meta'><b>"+esc(p.author)+"</b> <i>"+pretty(p.date)+"</i>" +
+          (p.media !== "text" ? " <i>"+esc(p.media)+"</i>" : "") +
+          (p.repost ? " <i>reposted from "+esc(p.reposted_from||"another author")+"</i>" : "") +
+        "</div>" +
+        "<p class='excerpt'>"+esc(p.excerpt)+"</p>" +
+        "<div class='post-foot'>" + chips +
+          "<span class='stats'>"+num(p.reactions)+" reactions, "+num(p.comments)+" comments, "+num(p.shares)+" shares</span>" +
+          (p.url ? "<a class='open' href='"+esc(p.url)+"' target='_blank' rel='noopener'>Open on LinkedIn</a>" : "") +
+        "</div>" +
+      "</div></article>";
+  }).join("") +
+  (list.length > 120 ? "<p class='sec-note' style='margin-top:18px'>Showing the top 120 of "+list.length+" posts.</p>" : "");
+}
+
+/* ---------- render: chrome ---------- */
+function renderStamp(){
+  var earliest = POSTS[POSTS.length-1].date;
+  document.getElementById("stamp").innerHTML =
+    "<span>Data as at " + esc(D.generated) + "</span>" +
+    "<span>" + D.authors.length + " tracked voices</span>" +
+    "<span>" + POSTS.length + " posts held</span>" +
+    "<span>" + pretty(earliest) + " to " + pretty(LATEST) + "</span>";
+  document.getElementById("latest").textContent = pretty(LATEST);
+
+  document.getElementById("window").innerHTML = WINDOWS.map(function(w){
+    return "<button data-win='"+w+"' aria-pressed='"+(w===state.win)+"'>"+(w?w+" days":"All held")+"</button>";
+  }).join("");
+
+  document.getElementById("author").innerHTML = "<option value=''>All voices</option>" +
+    D.authors.map(function(a){ return "<option value='"+esc(a)+"'>"+esc(a)+"</option>"; }).join("");
+
+  var shortest = null;
+  document.querySelector("#coverage tbody").innerHTML = D.authors.map(function(a){
+    var c = D.coverage[a], days = dayGap(c.from, LATEST) + 1;
+    if(shortest === null || days < shortest) shortest = days;
+    return "<tr><td>"+esc(a)+"</td><td>"+c.posts+"</td><td>"+pretty(c.from)+"</td>" +
+      "<td class='"+(days<=14?"short":"")+"'>"+days+"</td></tr>";
+  }).join("");
+  document.querySelector("#coverage").insertAdjacentHTML("afterend",
+    "<p style='margin-top:10px'>Shortest history held: <b>"+shortest+" days</b>. Periods longer than this are not like-for-like.</p>");
+}
+
+/* ---------- wiring ---------- */
+function render(){
+  var period = inPeriod();
+  var rows = aggregate(period);
+  renderModeCopy();
+  renderBoard(rows);
+  renderLegend();
+  renderDetail(rows);
+  renderPosts(visiblePosts());
+}
+
+function segHandler(id, key, attr, cast){
+  document.getElementById(id).addEventListener("click", function(e){
+    var b = e.target.closest("button[data-"+attr+"]");
+    if(!b) return;
+    state[key] = cast(b.getAttribute("data-"+attr));
+    Array.prototype.forEach.call(this.querySelectorAll("button"), function(x){
+      x.setAttribute("aria-pressed", String(x === b));
+    });
+    render();
+  });
+}
+
+function selectKey(t){
+  state.sel = (state.sel === t) ? null : t;
+  render();
+  var d = document.getElementById("detail");
+  if(d && typeof d.scrollIntoView === "function"){
+    try { d.scrollIntoView({block:"nearest", behavior:"smooth"}); } catch(_){ d.scrollIntoView(); }
+  }
+}
+
+renderStamp();
+document.getElementById("mode").addEventListener("click", function(e){
+  var b = e.target.closest("button[data-mode]");
+  if(!b) return;
+  state.mode = b.getAttribute("data-mode");
+  state.sel = null;
+  Array.prototype.forEach.call(this.querySelectorAll("button"), function(x){
+    x.setAttribute("aria-pressed", String(x === b));
+  });
+  render();
+});
+segHandler("places", "places", "places", Number);
+segHandler("window", "win", "win", Number);
+segHandler("minvoices", "min", "min", Number);
+segHandler("sort", "sort", "sort", String);
+
+document.getElementById("board").addEventListener("click", function(e){
+  var tr = e.target.closest("tr[data-key]");
+  if(tr) selectKey(tr.getAttribute("data-key"));
+});
+document.getElementById("board").addEventListener("keydown", function(e){
+  if(e.key !== "Enter" && e.key !== " ") return;
+  var tr = e.target.closest("tr[data-key]");
+  if(tr){ e.preventDefault(); selectKey(tr.getAttribute("data-key")); }
+});
+document.getElementById("posts").addEventListener("click", function(e){
+  var c = e.target.closest("button.chip");
+  if(c) selectKey(c.getAttribute("data-key"));
+});
+document.getElementById("author").addEventListener("change", function(){
+  state.author = this.value; render();
+});
+document.getElementById("csv").addEventListener("click", function(){
+  var rows = visiblePosts();
+  var cols = ["date","author","score","reactions","comments","shares","subjects","themes","media","repost","excerpt","url"];
+  var csv = [cols.join(",")].concat(rows.map(function(p){
+    return cols.map(function(c){
+      var v = c === "themes" ? p.topics.join("; ")
+            : c === "subjects" ? p.ents.map(function(i){ return ENT[i].name; }).join("; ")
+            : p[c];
+      if(v === null || v === undefined) v = "";
+      return '"' + String(v).replace(/"/g,'""') + '"';
+    }).join(",");
+  })).join("\r\n");
+  var name = "linkedin-signal-" + (state.sel !== null ? selLabel().toLowerCase().replace(/[^a-z0-9]+/g,"-") : "all") +
+    "-" + LATEST + ".csv";
+  var url = URL.createObjectURL(new Blob(["\ufeff" + csv], {type:"text/csv;charset=utf-8"}));
+  var a = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+});
+
+var qt;
+document.getElementById("q").addEventListener("input", function(){
+  var v = this.value;
+  clearTimeout(qt);
+  qt = setTimeout(function(){ state.q = v.trim(); render(); }, 160);
+});
+
+render();
+})();
+</script>
+</body>
+</html>
